@@ -123,24 +123,10 @@ serve(async (req) => {
       return new Response(JSON.stringify({ sent: 0, skipped: recipientIds.length }), { headers: corsHeaders });
     }
 
-    const { data: recipientProfiles } = await serviceClient
-      .from("profiles")
-      .select("id, is_online")
-      .in("id", targetRecipientIds);
-
-    const offlineRecipientIds = targetRecipientIds.filter((recipientId) => {
-      const profile = (recipientProfiles || []).find((row) => row.id === recipientId);
-      return !profile?.is_online;
-    });
-
-    if (offlineRecipientIds.length === 0) {
-      return new Response(JSON.stringify({ sent: 0, skipped: targetRecipientIds.length }), { headers: corsHeaders });
-    }
-
     const { data: subscriptions, error: subscriptionsError } = await serviceClient
       .from("push_subscriptions")
       .select("id, user_id, endpoint, p256dh, auth")
-      .in("user_id", offlineRecipientIds)
+      .in("user_id", targetRecipientIds)
       .eq("is_active", true);
 
     if (subscriptionsError) throw subscriptionsError;
