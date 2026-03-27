@@ -4,7 +4,6 @@ import webpush from "npm:web-push@3.6.7";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") || "";
 const WEB_PUSH_VAPID_PUBLIC_KEY = Deno.env.get("WEB_PUSH_VAPID_PUBLIC_KEY") || "";
 const WEB_PUSH_VAPID_PRIVATE_KEY = Deno.env.get("WEB_PUSH_VAPID_PRIVATE_KEY") || "";
 const WEB_PUSH_SUBJECT = Deno.env.get("WEB_PUSH_SUBJECT") || "mailto:notifications@unifychat.app";
@@ -43,18 +42,16 @@ serve(async (req) => {
     }
 
     const authHeader = req.headers.get("Authorization") || "";
-    if (!authHeader || !SUPABASE_ANON_KEY) {
+    if (!authHeader) {
       return new Response(JSON.stringify({ error: "missing_auth" }), { status: 401, headers: corsHeaders });
     }
 
-    const authedClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      global: { headers: { Authorization: authHeader } },
-    });
+    const accessToken = authHeader.replace(/^Bearer\s+/i, "").trim();
 
     const {
       data: { user },
       error: authError,
-    } = await authedClient.auth.getUser();
+    } = await serviceClient.auth.getUser(accessToken);
 
     if (authError || !user) {
       return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: corsHeaders });
