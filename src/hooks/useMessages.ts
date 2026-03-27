@@ -557,11 +557,12 @@ export function useMessages(conversationId: string | null) {
 
     (async () => {
       try {
+        const publishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
         const {
           data: { session },
         } = await supabase.auth.getSession();
 
-        if (session?.access_token) {
+        if (session?.access_token && publishableKey) {
           await supabase.functions.invoke("send_push_message", {
             body: {
               conversationId,
@@ -569,6 +570,7 @@ export function useMessages(conversationId: string | null) {
             },
             headers: {
               Authorization: `Bearer ${session.access_token}`,
+              apikey: publishableKey,
             },
           });
         }
