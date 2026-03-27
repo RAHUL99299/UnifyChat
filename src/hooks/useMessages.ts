@@ -555,16 +555,27 @@ export function useMessages(conversationId: string | null) {
       throw error;
     }
 
-    void supabase.functions
-      .invoke("send_push_message", {
-        body: {
-          conversationId,
-          messageId,
-        },
-      })
-      .catch(() => {
+    (async () => {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (session?.access_token) {
+          await supabase.functions.invoke("send_push_message", {
+            body: {
+              conversationId,
+              messageId,
+            },
+            headers: {
+              Authorization: `Bearer ${session.access_token}`,
+            },
+          });
+        }
+      } catch {
         // Push delivery failures should not affect message sending.
-      });
+      }
+    })();
 
     // Update conversation timestamp
     await supabase
