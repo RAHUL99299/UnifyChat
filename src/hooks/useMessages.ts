@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { getMessagePreviewText } from "@/lib/messageContent";
 import { showIncomingMessageNotification } from "@/lib/browserNotifications";
+import { toast } from "@/hooks/use-toast";
 
 const messageCache = new Map<string, MessageWithSender[]>();
 const senderProfileCache = new Map<string, { display_name: string | null; avatar_url: string | null }>();
@@ -426,14 +427,24 @@ export function useMessages(conversationId: string | null) {
       });
 
       if (row.sender_id !== user.id) {
-        showIncomingMessageNotification({
-          userId: user.id,
-          messageId: row.id,
-          senderName: incoming.sender_name,
-          content: incoming.content,
-          messageType: incoming.message_type,
-          conversationId,
-        });
+        const appInForeground = document.visibilityState === "visible" && document.hasFocus();
+
+        if (appInForeground) {
+          toast({
+            title: incoming.sender_name || "New message",
+            description: getMessagePreviewText(incoming.message_type, incoming.content),
+          });
+        } else {
+          showIncomingMessageNotification({
+            userId: user.id,
+            messageId: row.id,
+            senderName: incoming.sender_name,
+            content: incoming.content,
+            messageType: incoming.message_type,
+            conversationId,
+          });
+        }
+
         await markMessagesAsRead([row.id]);
       }
     };
