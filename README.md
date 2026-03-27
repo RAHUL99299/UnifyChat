@@ -60,3 +60,46 @@ npm run build
 ```
 
 Then upload the contents of the `dist` folder to your hosting provider.
+
+## Web Push Setup (Mobile Top-Bar Notifications)
+
+To enable push notifications that work when the app is in the background or closed:
+
+1. Generate VAPID keys (one-time):
+
+```sh
+npx web-push generate-vapid-keys
+```
+
+2. Add the public key to your app environment:
+
+```sh
+VITE_WEB_PUSH_PUBLIC_KEY=<your_public_key>
+```
+
+3. Deploy the Supabase edge function:
+
+```sh
+supabase functions deploy send_push_message
+```
+
+4. Set these Supabase function secrets:
+
+```sh
+SUPABASE_URL=<project_url>
+SUPABASE_SERVICE_ROLE_KEY=<service_role_key>
+SUPABASE_ANON_KEY=<anon_key>
+WEB_PUSH_VAPID_PUBLIC_KEY=<your_public_key>
+WEB_PUSH_VAPID_PRIVATE_KEY=<your_private_key>
+WEB_PUSH_SUBJECT=mailto:you@example.com
+```
+
+5. Run DB migrations so `push_subscriptions` exists:
+
+```sh
+supabase db push
+```
+
+Notes:
+- Push notifications require HTTPS in production.
+- iOS Safari web push requires users to add the app to Home Screen.

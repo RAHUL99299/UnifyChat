@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   username TEXT UNIQUE,
   display_name TEXT,
+  phone TEXT,
   bio TEXT DEFAULT '',
   avatar_url TEXT,
   is_online BOOLEAN DEFAULT false,
@@ -16,6 +17,10 @@ CREATE TABLE IF NOT EXISTS public.profiles (
 );
 
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+-- Ensure phone column exists for all environments
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS phone TEXT;
 
 -- Anyone authenticated can view profiles
 DROP POLICY IF EXISTS "Anyone can view profiles" ON public.profiles;
@@ -332,4 +337,52 @@ CREATE POLICY "Users can delete own avatar"
   ON storage.objects FOR DELETE
   USING (bucket_id = 'avatars'
          AND auth.uid()::text = (storage.foldername(name))[1]);
+
+
+-- 13. Push subscriptions table
+CREATE TABLE IF NOT EXISTS public.push_subscriptions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  endpoint TEXT NOT NULL UNIQUE,
+  p256dh TEXT,
+  auth TEXT,
+  user_agent TEXT,
+  is_active BOOLEAN NOT NULL DEFAULT true,
+  last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.push_subscriptions ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view own push subscriptions" ON public.push_subscriptions;
+CREATE POLICY "Users can view own push subscriptions"
+  ON public.push_subscriptions FOR SELECT
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can insert own push subscriptions" ON public.push_subscriptions;
+CREATE POLICY "Users can insert own push subscriptions"
+  ON public.push_subscriptions FOR INSERT
+  TO authenticated
+  WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can update own push subscriptions" ON public.push_subscriptions;
+CREATE POLICY "Users can update own push subscriptions"
+  ON public.push_subscriptions FOR UPDATE
+  TO authenticated
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users can delete own push subscriptions" ON public.push_subscriptions;
+CREATE POLICY "Users can delete own push subscriptions"
+  ON public.push_subscriptions FOR DELETE
+  TO authenticated
+  USING (auth.uid() = user_id);
+
+CREATE INDEX IF NOT EXISTS idx_push_subscriptions_user_id
+  ON public.push_subscriptions(user_id);
+
+CREATE INDEX IF NOT EXISTS idx_push_subscriptions_active
+  ON public.push_subscriptions(is_active);
 

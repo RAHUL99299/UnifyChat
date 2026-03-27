@@ -1,5 +1,6 @@
 import { Message } from "@/data/sampleChats";
 import { Check, CheckCheck } from "lucide-react";
+import { useUserSettings } from "@/hooks/useUserSettings";
 
 interface MessageBubbleProps {
   message: Message;
@@ -7,6 +8,8 @@ interface MessageBubbleProps {
 
 const MessageBubble = ({ message }: MessageBubbleProps) => {
   const isOut = message.isOutgoing;
+  const { settings } = useUserSettings();
+  const readReceiptsEnabled = settings?.privacy?.readReceipts !== false;
 
   return (
     <div className={`flex ${isOut ? "justify-end" : "justify-start"} mb-1 animate-message-in`}>
@@ -23,6 +26,9 @@ const MessageBubble = ({ message }: MessageBubbleProps) => {
           {isOut && (
             <span className="text-tick">
               {message.status === "sent" ? (
+                <Check className="h-3.5 w-3.5" />
+              ) : !readReceiptsEnabled ? (
+                // if read receipts disabled, show a single check for delivered/read
                 <Check className="h-3.5 w-3.5" />
               ) : (
                 <CheckCheck

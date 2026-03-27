@@ -75,11 +75,15 @@ const GroupParticipantsPanel = ({ conversationId, groupName, onClose }: GroupPar
             {participants.map((p) => (
               <div key={p.user_id} className="flex items-center gap-3 rounded-lg p-2 hover:bg-muted transition-colors">
                 <div className="relative">
-                  <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-sm font-semibold text-muted-foreground">
-                    {p.display_name[0]?.toUpperCase()}
+                  <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center overflow-hidden text-sm font-semibold text-muted-foreground">
+                    {p.avatar_url ? (
+                      <img src={p.avatar_url} alt={p.display_name} className="h-full w-full object-cover" />
+                    ) : (
+                      p.display_name[0]?.toUpperCase()
+                    )}
                   </div>
                   {p.is_online && (
-                    <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-card bg-online" />
+                    <span className="pointer-events-none absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-card bg-online" />
                   )}
                 </div>
                 <div className="flex-1 min-w-0">

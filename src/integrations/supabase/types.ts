@@ -106,6 +106,7 @@ export type Database = {
           created_at: string | null
           id: string
           message_type: string | null
+          reply_to_id: string | null
           sender_id: string
           status: string | null
           updated_at: string | null
@@ -116,6 +117,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           message_type?: string | null
+          reply_to_id?: string | null
           sender_id: string
           status?: string | null
           updated_at?: string | null
@@ -126,6 +128,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           message_type?: string | null
+          reply_to_id?: string | null
           sender_id?: string
           status?: string | null
           updated_at?: string | null
@@ -136,6 +139,13 @@ export type Database = {
             columns: ["conversation_id"]
             isOneToOne: false
             referencedRelation: "conversations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "messages"
             referencedColumns: ["id"]
           },
         ]
@@ -149,6 +159,8 @@ export type Database = {
           id: string
           is_online: boolean | null
           last_seen: string | null
+          phone: string | null
+          phone_verified: boolean | null
           updated_at: string | null
           username: string | null
         }
@@ -160,6 +172,8 @@ export type Database = {
           id: string
           is_online?: boolean | null
           last_seen?: string | null
+          phone?: string | null
+          phone_verified?: boolean | null
           updated_at?: string | null
           username?: string | null
         }
@@ -171,6 +185,8 @@ export type Database = {
           id?: string
           is_online?: boolean | null
           last_seen?: string | null
+          phone?: string | null
+          phone_verified?: boolean | null
           updated_at?: string | null
           username?: string | null
         }

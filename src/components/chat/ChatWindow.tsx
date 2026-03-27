@@ -3,6 +3,7 @@ import { ChatContact, Message, sampleMessages } from "@/data/sampleChats";
 import ChatHeader from "./ChatHeader";
 import MessageBubble from "./MessageBubble";
 import { Paperclip, Smile, Mic, Send } from "lucide-react";
+import { useUserSettings } from "@/hooks/useUserSettings";
 
 interface ChatWindowProps {
   contact: ChatContact;
@@ -15,6 +16,7 @@ const ChatWindow = ({ contact, onBack }: ChatWindowProps) => {
   );
   const [inputText, setInputText] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+  const { settings } = useUserSettings();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -43,7 +45,10 @@ const ChatWindow = ({ contact, onBack }: ChatWindowProps) => {
       <ChatHeader contact={contact} onBack={onBack} />
 
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto bg-chat-bg px-4 py-3">
+      <div
+        className="flex-1 overflow-y-auto bg-chat-bg px-4 py-3"
+        style={{ background: settings?.chats?.wallpaper && settings.chats.wallpaper !== 'none' ? settings.chats.wallpaper : undefined }}
+      >
         {messages.length === 0 ? (
           <div className="flex h-full items-center justify-center">
             <p className="text-sm text-muted-foreground italic">

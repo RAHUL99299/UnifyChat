@@ -4,6 +4,7 @@ interface CallRecord {
   id: string;
   name: string;
   initials: string;
+  avatar_url?: string;
   type: "voice" | "video";
   direction: "incoming" | "outgoing" | "missed";
   time: string;
@@ -32,17 +33,17 @@ const CallsPage = ({ onBack }: CallsPageProps) => {
   };
 
   return (
-    <div className="flex h-full flex-col bg-card">
-      <div className="flex items-center gap-3 bg-header px-4 py-3 text-header-foreground">
-        <button onClick={onBack} className="p-1 hover:bg-primary/20 rounded-full transition-colors">
+    <div className="flex h-full min-w-0 flex-col bg-card">
+      <div className="flex items-center gap-3 bg-header px-3 py-3 text-header-foreground sm:px-4">
+        <button onClick={onBack} className="min-h-10 min-w-10 rounded-full p-1 hover:bg-primary/20 transition-colors">
           <ArrowLeft className="h-5 w-5" />
         </button>
         <h2 className="text-lg font-semibold">Calls</h2>
       </div>
 
       {/* Link to create call */}
-      <div className="px-4 py-3 border-b border-border">
-        <button className="flex w-full items-center gap-3 rounded-lg p-2 hover:bg-muted transition-colors">
+      <div className="border-b border-border px-3 py-3 sm:px-4">
+        <button className="flex min-h-12 w-full items-center gap-3 rounded-lg p-2 hover:bg-muted transition-colors">
           <div className="h-12 w-12 rounded-full bg-primary flex items-center justify-center">
             <Phone className="h-5 w-5 text-primary-foreground" />
           </div>
@@ -50,15 +51,19 @@ const CallsPage = ({ onBack }: CallsPageProps) => {
         </button>
       </div>
 
-      <div className="px-4 py-2">
+      <div className="px-3 py-2 sm:px-4">
         <h3 className="text-xs font-semibold text-primary uppercase tracking-wide mb-2">Recent</h3>
       </div>
 
       <div className="flex-1 overflow-y-auto">
         {dummyCalls.map((call) => (
-          <div key={call.id} className="flex items-center gap-3 px-4 py-3 hover:bg-muted/60 transition-colors">
-            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center text-sm font-semibold text-muted-foreground">
-              {call.initials}
+          <div key={call.id} className="flex items-center gap-3 px-3 py-3 transition-colors hover:bg-muted/60 sm:px-4">
+            <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center overflow-hidden text-sm font-semibold text-muted-foreground">
+              {call.avatar_url ? (
+                <img src={call.avatar_url} alt={call.name} className="h-full w-full object-cover" />
+              ) : (
+                call.initials
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <p className={`text-sm font-medium ${call.direction === "missed" ? "text-destructive" : "text-foreground"}`}>
@@ -69,7 +74,7 @@ const CallsPage = ({ onBack }: CallsPageProps) => {
                 <span className="text-xs text-muted-foreground">{call.time}</span>
               </div>
             </div>
-            <button className="p-2 text-primary hover:bg-muted rounded-full transition-colors">
+            <button className="min-h-10 min-w-10 rounded-full p-2 text-primary transition-colors hover:bg-muted">
               {call.type === "video" ? <Video className="h-5 w-5" /> : <Phone className="h-5 w-5" />}
             </button>
           </div>

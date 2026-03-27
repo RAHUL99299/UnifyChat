@@ -18,7 +18,7 @@ const ChatHeader = ({ contact, onBack }: ChatHeaderProps) => {
           {contact.avatar}
         </div>
         {contact.isOnline && (
-          <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-header bg-online" />
+          <span className="pointer-events-none absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-header bg-online" />
         )}
       </div>
 

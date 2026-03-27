@@ -127,9 +127,64 @@
     @apply border-border;
   }
 
+  html,
+  body,
+  #root {
+    width: 100%;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
   body {
     @apply bg-background text-foreground;
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+}
+
+@media (min-width: 320px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 480px) {
+  html {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+@media (min-width: 1280px) {
+  html {
+    font-size: 17px;
   }
 }
 
@@ -170,5 +225,36 @@
 
   .gradient-btn:hover {
     background: linear-gradient(135deg, hsl(var(--gradient-start) / 0.9), hsl(var(--gradient-end) / 0.9));
+  }
+
+  .story-ring {
+    position: relative;
+  }
+
+  .story-ring::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: 9999px;
+    background: conic-gradient(
+      from 0deg,
+      hsl(var(--gradient-start)),
+      hsl(var(--gradient-mid)),
+      hsl(var(--gradient-end)),
+      hsl(var(--gradient-start))
+    );
+    z-index: -1;
+    opacity: 0.9;
+    filter: saturate(1.1);
+    animation: storyRingSpin 4s linear infinite;
+  }
+
+  @keyframes storyRingSpin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
   }
 }

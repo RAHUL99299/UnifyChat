@@ -1,4 +1,5 @@
 import { ChatContact } from "@/data/sampleChats";
+import { useUserSettings } from "@/hooks/useUserSettings";
 import { Check, CheckCheck } from "lucide-react";
 
 interface ChatListItemProps {
@@ -8,6 +9,10 @@ interface ChatListItemProps {
 }
 
 const ChatListItem = ({ contact, isActive, onClick }: ChatListItemProps) => {
+  const { settings } = useUserSettings();
+
+  const hidePhotos = settings?.privacy?.profilePhoto === "nobody";
+
   return (
     <button
       onClick={onClick}
@@ -18,10 +23,10 @@ const ChatListItem = ({ contact, isActive, onClick }: ChatListItemProps) => {
       {/* Avatar */}
       <div className="relative flex-shrink-0">
         <div className="flex h-12 w-12 items-center justify-center rounded-full bg-muted text-sm font-semibold text-muted-foreground">
-          {contact.avatar}
+          {hidePhotos ? "" : contact.avatar}
         </div>
         {contact.isOnline && (
-          <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card bg-online" />
+          <span className="pointer-events-none absolute bottom-0 right-0 h-3 w-3 rounded-full border-2 border-card bg-online" />
         )}
       </div>
 
